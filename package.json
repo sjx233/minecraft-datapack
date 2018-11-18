@@ -27,6 +27,7 @@
   ],
   "dependencies": {
     "fs-extra": "^7.0.1",
+    "resource-location": "^1.0.0",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
