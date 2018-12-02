@@ -1,7 +1,5 @@
-import { Datapack } from "../index";
+import { MinecraftFunction, Pack, PackType } from "../index";
 
-const datapack = new Datapack("Test datapack.");
-datapack.setFunction("domain:tests/1", ["say test"]);
-datapack.setFunctionIfAbsent("domain:tests/1", () => ["say this should not happen"]);
-datapack.setFunctionIfAbsent("domain:tests/2", () => ["say this should exist"]);
-datapack.writeTo("test");
+const datapack = new Pack(PackType.DATA_PACK, "Test datapack.");
+datapack.addResource(new MinecraftFunction("namespace:test", ["tellraw @a \"Test 1\"", "tellraw @a \"Test 2\"", "tellraw @a \"Test 3\""]));
+datapack.writeTo("test/datapack");

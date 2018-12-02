@@ -1,39 +1,44 @@
 {
-  "name": "minecraft-datapack",
+  "name": "minecraft-packs",
   "version": "1.0.0",
-  "description": "Minecraft datapacks.",
+  "description": "Creates Minecraft resourcepacks and datapacks.",
+  "keywords": [
+    "minecraft",
+    "resourcepack",
+    "datapack",
+    "function"
+  ],
+  "homepage": "https://github.com/sjx233/minecraft-packs#readme",
+  "bugs": "https://github.com/sjx233/minecraft-packs/issues",
+  "license": "MIT",
+  "author": "sjx233",
   "main": "lib/index.js",
   "typings": "lib/index",
+  "directories": {
+    "lib": "lib",
+    "test": "lib/test"
+  },
+  "repository": "github:sjx233/minecraft-packs",
   "scripts": {
     "lint": "tslint --project .",
     "lint-fix": "tslint --project . --fix",
     "build": "rm -rf lib && tsc",
-    "test": "node lib/test/test.js"
+    "test": "node lib/test/test.js",
+    "preversion": "npm run build && npm test",
+    "postversion": "git push && git push --tags"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sjx233/minecraft-datapack.git"
-  },
-  "author": "sjx233",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/sjx233/minecraft-datapack/issues"
-  },
-  "homepage": "https://github.com/sjx233/minecraft-datapack#readme",
-  "keywords": [
-    "minecraft",
-    "datapack",
-    "function"
-  ],
   "dependencies": {
     "fs-extra": "^7.0.1",
-    "resource-location": "^1.0.0",
+    "resource-location": "^2.2.0",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4",
-    "@types/node": "^10.12.0",
+    "@types/node": "^10.12.11",
     "tslint": "^5.11.0",
-    "typescript": "^3.1.1"
+    "typescript": "^3.2.1"
+  },
+  "engines": {
+    "node": ">=6.0.0"
   }
 }

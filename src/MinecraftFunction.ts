@@ -1,16 +1,23 @@
-import fs from "fs-extra";
-import path from "path";
 import ResourceLocation from "resource-location";
+import { Readable, Writable } from "stream";
+import { Resource } from "./Resource";
+import { ResourceType } from "./ResourceType";
 
-export class MinecraftFunction {
-  constructor(public readonly id: ResourceLocation, public readonly commands: ReadonlyArray<string>) { }
+export class MinecraftFunction extends Resource<MinecraftFunction> {
+  public constructor(id: string | ResourceLocation, public readonly commands: ReadonlyArray<string>) {
+    super(ResourceType.FUNCTION, id);
+  }
 
-  public async writeTo(dirname: string) {
-    const functionPath = path.join(dirname, this.id.toPath("functions") + ".mcfunction");
-    await fs.ensureDir(path.dirname(functionPath));
-    const fileDescriptor = await fs.open(functionPath, "w");
-    for (const command of this.commands)
-      await fs.write(fileDescriptor, command + "\n", 0);
-    fs.close(fileDescriptor);
+  protected write(stream: Writable) {
+    const commands = this.commands;
+    const length = commands.length;
+    let line = 0;
+    new Readable({
+      read() {
+        while (line < length)
+          if (!this.push(commands[line++] + "\n")) return;
+        this.push(null);
+      }
+    }).pipe(stream);
   }
 }

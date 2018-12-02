@@ -1,1 +1,0 @@
-{"version":3,"file":"MinecraftFunction.d.ts","sourceRoot":"","sources":["../src/MinecraftFunction.ts"],"names":[],"mappings":"AAEA,OAAO,gBAAgB,MAAM,mBAAmB,CAAC;AAEjD,qBAAa,iBAAiB;aACA,EAAE,EAAE,gBAAgB;aAAkB,QAAQ,EAAE,aAAa,CAAC,MAAM,CAAC;gBAArE,EAAE,EAAE,gBAAgB,EAAkB,QAAQ,EAAE,aAAa,CAAC,MAAM,CAAC;IAEpF,OAAO,CAAC,OAAO,EAAE,MAAM;CAQrC"}

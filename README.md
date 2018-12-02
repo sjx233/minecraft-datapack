@@ -1,3 +1,3 @@
-# minecraft-datapack
+# minecraft-packs
 
-Minecraft datapacks.
+Creates Minecraft resourcepacks and datapacks.
