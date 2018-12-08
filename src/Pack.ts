@@ -10,6 +10,11 @@ export class Pack {
 
   public constructor(public readonly type: PackType, public readonly description: string) { }
 
+  public getResources<T extends Resource>(type: ResourceType<T>) {
+    if (type.packType !== this.type) throw new TypeError("Getting resource of wrong pack type.");
+    return this.resources.filter(x => x.type === type);
+  }
+
   public getResource<T extends Resource>(type: ResourceType<T>, id: string | ResourceLocation) {
     if (type.packType !== this.type) throw new TypeError("Getting resource of wrong pack type.");
     return this.resources.find(x => x.type === type && x.id.is(id));
@@ -26,10 +31,10 @@ export class Pack {
     return newResource;
   }
 
-  public deleteResource<T extends Resource>(type: ResourceType<T>, id: string | ResourceLocation) {
+  public deleteResources<T extends Resource>(type: ResourceType<T>, id?: string | ResourceLocation) {
     if (type.packType !== this.type) throw new TypeError("Deleting resource of wrong pack type.");
     const resources = this.resources;
-    const index = resources.findIndex(x => x.type === type && x.id.is(id));
+    const index = resources.findIndex(id ? x => x.type === type && x.id.is(id) : x => x.type === type);
     return index === -1 ? undefined : resources.splice(index, 1)[0];
   }
 
