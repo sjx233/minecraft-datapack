@@ -1,7 +1,7 @@
 import fs from "fs-extra";
-import { PackType } from "PackType";
 import path from "path";
 import ResourceLocation from "resource-location";
+import { PackType } from "./PackType";
 import { Resource } from "./Resource";
 import { ResourceType } from "./ResourceType";
 
