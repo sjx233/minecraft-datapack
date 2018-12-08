@@ -4,9 +4,7 @@ import path from "path";
 import ResourceLocation from "resource-location";
 
 export async function getNamespaces(dirname: string) {
-  return fs.readdirSync(dirname, {
-    withFileTypes: true
-  }).filter(x => x.isDirectory()).map(x => x.name).filter(x => x === x.toLowerCase());
+  return fs.readdirSync(dirname).filter(x => x === x.toLowerCase() && fs.statSync(path.join(dirname, x)).isDirectory());
 }
 
 export async function getNamespacedPaths(dirname: string, base: string, extension?: string) {
