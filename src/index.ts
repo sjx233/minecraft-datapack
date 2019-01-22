@@ -9,14 +9,22 @@ export class Pack {
 
   public constructor(public readonly type: PackType, public readonly description: string) { }
 
+  public getAllResources() {
+    return Array.from(this.resources);
+  }
+
+  public resourceCount() {
+    return this.resources.length;
+  }
+
   public getResources<T extends Resource>(type: ResourceType<T>) {
     if (type.packType !== this.type) throw new TypeError("Getting resource of wrong pack type.");
-    return this.resources.filter(x => x.type === type);
+    return this.resources.filter(resource => resource.type === type);
   }
 
   public getResource<T extends Resource>(type: ResourceType<T>, id: string | ResourceLocation) {
     if (type.packType !== this.type) throw new TypeError("Getting resource of wrong pack type.");
-    return this.resources.find(x => x.type === type && x.id.is(id));
+    return this.resources.find(resource => resource.type === type && resource.id.is(id));
   }
 
   public addResource<T extends Resource>(newResource: T) {
@@ -24,7 +32,7 @@ export class Pack {
     if (type.packType !== this.type) throw new TypeError("Adding resource of wrong pack type.");
     const id = newResource.id;
     const resources = this.resources;
-    const index = resources.findIndex(x => x.type === type && x.id.is(id));
+    const index = resources.findIndex(resource => resource.type === type && resource.id.is(id));
     if (index === -1) resources.push(newResource);
     else resources[index] = newResource;
     return newResource;
@@ -33,23 +41,23 @@ export class Pack {
   public deleteResources<T extends Resource>(type: ResourceType<T>, id?: string | ResourceLocation) {
     if (type.packType !== this.type) throw new TypeError("Deleting resource of wrong pack type.");
     const resources = this.resources;
-    const index = resources.findIndex(id ? x => x.type === type && x.id.is(id) : x => x.type === type);
+    const index = resources.findIndex(id ? resource => resource.type === type && resource.id.is(id) : resource => resource.type === type);
     return index === -1 ? undefined : resources.splice(index, 1)[0];
   }
 
-  public async write(dirname: string) {
-    fs.emptyDirSync(dirname);
+  public async write(dirname: string, writeCallback?: (resource: Resource) => void) {
+    await fs.emptyDir(dirname);
     const resourcesDirname = path.join(dirname, this.type);
     await Promise.all([fs.writeJson(path.join(dirname, "pack.mcmeta"), {
       pack: {
         description: this.description,
         pack_format: 4
       }
-    }), ...this.resources.map(x => x.write(resourcesDirname))]);
+    }), ...this.resources.map(writeCallback ? resource => resource.write(resourcesDirname).then(() => writeCallback(resource)) : resource => resource.write(resourcesDirname))]);
   }
 
   public static async read(dirname: string, type: PackType) {
-    const metadata = fs.readJsonSync(path.join(dirname, "pack.mcmeta"));
+    const metadata = await fs.readJson(path.join(dirname, "pack.mcmeta"));
     if (!(metadata && metadata.pack && typeof metadata.pack === "object")) throw new TypeError("Invalid pack");
     const packInfo = metadata.pack;
     if (typeof packInfo.description !== "string") throw new TypeError("Invalid description");
@@ -76,7 +84,7 @@ export abstract class Resource {
   }
 
   public async write(dirname: string) {
-    this.type.write(dirname, this);
+    await this.type.write(dirname, this);
   }
 }
 
@@ -87,22 +95,22 @@ export class ResourceType<T extends Resource> {
     const extensionLength = extension.length;
     return new ResourceType<MinecraftFunction>(PackType.DATA_PACK, {
       async read(dirname: string) {
-        return await Promise.all((await getResourceLocations(dirname, base, extension)).map(x => new Promise<MinecraftFunction>(resolve => {
+        return await Promise.all((await getResourceLocations(dirname, base, extension)).map(resourceLocation => new Promise<MinecraftFunction>(resolve => {
           const commands: string[] = [];
           readline.createInterface({
             crlfDelay: Infinity,
-            input: fs.createReadStream(path.join(dirname, x.toPath(base)))
-          }).on("line", x => commands.push(x)).on("close", () => {
-            const path = x.path;
-            return resolve(new MinecraftFunction(new ResourceLocation(x.namespace, path.substring(0, path.length - extensionLength)), commands));
+            input: fs.createReadStream(path.join(dirname, resourceLocation.toPath(base)))
+          }).on("line", line => commands.push(line)).on("close", () => {
+            const path = resourceLocation.path;
+            return resolve(new MinecraftFunction(new ResourceLocation(resourceLocation.namespace, path.substring(0, path.length - extensionLength)), commands));
           });
         })));
       },
       async write(this: ResourceType<MinecraftFunction>, dirname: string, resource: MinecraftFunction) {
         const filePath = path.join(dirname, resource.id.toPath(base, extension));
-        fs.ensureDirSync(path.dirname(filePath));
+        await fs.ensureDir(path.dirname(filePath));
         for (const command of resource.commands)
-          fs.appendFileSync(filePath, command + "\n");
+          await fs.appendFile(filePath, command + "\n");
       }
     });
   })();
