@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import readline from "readline";
 import ResourceLocation from "resource-location";
-import { getResourceLocations } from "./util";
+import { asyncMap, getResourceLocations } from "./util";
 
 export class Pack {
   private readonly resources: Resource[] = [];
@@ -48,12 +48,13 @@ export class Pack {
   public async write(dirname: string, writeCallback?: (resource: Resource) => void) {
     await fs.emptyDir(dirname);
     const resourcesDirname = path.join(dirname, this.type);
-    await Promise.all([fs.writeJson(path.join(dirname, "pack.mcmeta"), {
+    await fs.writeJson(path.join(dirname, "pack.mcmeta"), {
       pack: {
         description: this.description,
         pack_format: 4
       }
-    }), ...this.resources.map(writeCallback ? resource => resource.write(resourcesDirname).then(() => writeCallback(resource)) : resource => resource.write(resourcesDirname))]);
+    });
+    await Promise.all(await asyncMap(this.resources, writeCallback ? resource => resource.write(resourcesDirname).then(() => writeCallback(resource)) : resource => resource.write(resourcesDirname)));
   }
 
   public static async read(dirname: string, type: PackType) {
