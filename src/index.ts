@@ -110,8 +110,10 @@ export class ResourceType<T extends Resource> {
       async write(this: ResourceType<MinecraftFunction>, dirname: string, resource: MinecraftFunction) {
         const filePath = path.join(dirname, resource.id.toPath(base, extension));
         await fs.ensureDir(path.dirname(filePath));
+        const handle = await fs.promises.open(filePath, "w");
         for (const command of resource.commands)
-          await fs.appendFile(filePath, command + "\n");
+          await handle.write(command + "\n");
+        await handle.close();
       }
     });
   })();
