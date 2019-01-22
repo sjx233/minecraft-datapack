@@ -1,6 +1,6 @@
 {
   "name": "minecraft-packs",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Creates Minecraft resourcepacks and datapacks.",
   "keywords": [
     "minecraft",
