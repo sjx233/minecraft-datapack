@@ -1,20 +1,26 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "es2019",
     "module": "commonjs",
     "moduleResolution": "node",
-    "esModuleInterop": true,
-    "baseUrl": "./src",
-    "rootDir": "./src",
+    "baseUrl": ".",
     "outDir": "./lib",
     "strict": true,
-    "noUnusedLocals": true,
     "removeComments": true,
     "importHelpers": true,
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-  }
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "*": [
+        "node_modules/*",
+        "src/types/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ]
 }
