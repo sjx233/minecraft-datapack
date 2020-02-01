@@ -11,20 +11,20 @@ export = class ResourceMap<T> implements Map<ResourceLocation, T> {
     this.map.clear();
   }
 
-  public delete(key: ResourceLocation): boolean {
-    return this.map.delete(key.toString());
+  public delete(key: string | ResourceLocation): boolean {
+    return this.map.delete(ResourceLocation.from(key).toString());
   }
 
-  public get(key: ResourceLocation): T | undefined {
-    return this.map.get(key.toString());
+  public get(key: string | ResourceLocation): T | undefined {
+    return this.map.get(ResourceLocation.from(key).toString());
   }
 
-  public has(key: ResourceLocation): boolean {
-    return this.map.has(key.toString());
+  public has(key: string | ResourceLocation): boolean {
+    return this.map.has(ResourceLocation.from(key).toString());
   }
 
-  public set(key: ResourceLocation, value: T): this {
-    this.map.set(key.toString(), value);
+  public set(key: string | ResourceLocation, value: T): this {
+    this.map.set(ResourceLocation.from(key).toString(), value);
     return this;
   }
 

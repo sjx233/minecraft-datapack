@@ -29,19 +29,16 @@
   "dependencies": {
     "fast-glob": "^3.1.1",
     "fs-extra": "^8.1.0",
-    "ow": "^0.15.0",
-    "pngjs": "^3.4.0",
-    "resource-location": "^3.0.0",
+    "resource-location": "^3.0.1",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
-    "@types/node": "^12.12.21",
-    "@types/pngjs": "^3.4.0",
-    "@typescript-eslint/eslint-plugin": "^2.12.0",
-    "@typescript-eslint/parser": "^2.12.0",
+    "@types/node": "^13.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.18.0",
+    "@typescript-eslint/parser": "^2.18.0",
     "eslint": "^6.8.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "engines": {
     "node": ">=11.13.0"

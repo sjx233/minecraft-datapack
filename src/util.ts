@@ -6,23 +6,6 @@ import ResourceLocation = require("resource-location");
 
 const readdir = promisify(fs.readdir);
 
-export type ValuesOf<T> = T extends readonly (infer U)[] ? U : never;
-
-export function mostFrequent<T>(arr: T[], defaultValue: T): T {
-  arr = Array.from(arr).sort();
-  const counts = new Map<T, number>();
-  for (const value of arr)
-    counts.set(value, (counts.get(value) ?? 0) + 1);
-  let result = defaultValue;
-  let max = 0;
-  for (const [value, count] of counts)
-    if (count > max) {
-      result = value;
-      max = count;
-    }
-  return result;
-}
-
 export async function* getNamespaces(dirname: string): AsyncGenerator<string, void> {
   for (const entry of await readdir(dirname, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
