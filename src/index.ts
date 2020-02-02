@@ -6,6 +6,7 @@ import ResourceLocation = require("resource-location");
 import ResourceMap = require("./resource-map");
 
 export * from "./resource";
+export { ResourceMap };
 
 export type PackType = "assets" | "data";
 

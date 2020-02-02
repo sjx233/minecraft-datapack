@@ -1,6 +1,6 @@
 import ResourceLocation = require("resource-location");
 
-export = class ResourceMap<T> implements Map<ResourceLocation, T> {
+class ResourceMap<T> implements Map<ResourceLocation, T> {
   private readonly map = new Map<string, T>();
 
   public get size(): number {
@@ -55,4 +55,6 @@ export = class ResourceMap<T> implements Map<ResourceLocation, T> {
   public get [Symbol.toStringTag](): string {
     return "ResourceMap";
   }
-};
+}
+
+export = ResourceMap;
