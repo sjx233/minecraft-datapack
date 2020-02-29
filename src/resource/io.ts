@@ -99,7 +99,7 @@ const functionIO: ResourceIO<string[]> = {
   async write(dirname: string, id: ResourceLocation, resource: string[]) {
     const filePath = path.join(dirname, id.toPath("functions", ".mcfunction"));
     await fs.ensureDir(path.dirname(filePath));
-    await fs.writeFile(filePath, resource.join("\n") + "\n");
+    await fs.writeFile(filePath, resource.map(line => line + "\n").join(""));
   }
 };
 const io = new Map<ResourceType, ResourceIO<any>>([
