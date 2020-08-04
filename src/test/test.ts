@@ -1,41 +1,48 @@
 import * as assert from "assert";
-import { DataPack, Pack } from "..";
+import { DataPack } from "..";
 
 (async () => {
-  const pack = new DataPack("test data pack");
-  pack.advancements.set("test:get_apple", {
-    "parent": "minecraft:husbandry/root",
-    "display": {
-      "title": "Apple",
-      "description": "Get an apple",
-      "icon": {
-        "item": "minecraft:apple"
+  const written = new DataPack("Test data pack.");
+  written.advancements.set("test:get_apple", {
+    parent: "minecraft:husbandry/root",
+    display: {
+      title: "Apple",
+      description: "Get an apple",
+      icon: {
+        item: "minecraft:apple"
       }
     },
-    "criteria": {
-      "get_apple": {
-        "trigger": "minecraft:inventory_changed",
-        "conditions": {
-          "items": [
-            { "item": "minecraft:apple" }
+    criteria: {
+      get_apple: {
+        trigger: "minecraft:inventory_changed",
+        conditions: {
+          items: [
+            {
+              item: "minecraft:apple"
+            }
           ]
         }
       }
     }
   });
-  pack.functions.set("test:countdown", [
+  written.functions.set("test:countdown", [
     "# countdown",
     "",
     "say 3",
     "say 2",
     "say 1"
   ]);
-  pack.tags.set("test:blocks/doors", {
+  written.tags.set("test:blocks/doors", {
     values: [
       "#minecraft:wooden_doors",
-      "minecraft:iron_door"
+      { id: "minecraft:iron_door", required: false }
     ]
   });
-  await pack.write("test/data");
-  assert.deepStrictEqual(await Pack.read("test/data", "data"), pack);
-})();
+  await written.write("test/data");
+  const read = new DataPack;
+  await read.read("test/data");
+  assert.deepStrictEqual(read, written);
+})().catch(error => {
+  process.stderr.write(error + "\n");
+  process.exit(1);
+});

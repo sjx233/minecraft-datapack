@@ -1,3 +1,3 @@
 # minecraft-packs
 
-Creates Minecraft resource packs and data packs.
+Library for creating and editing Minecraft resource packs and data packs.

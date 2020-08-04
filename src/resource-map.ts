@@ -28,8 +28,7 @@ class ResourceMap<T> implements Map<ResourceLocation, T> {
     return this;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public forEach(callback: (value: T, key: ResourceLocation, map: Map<ResourceLocation, T>) => void, thisArg?: any): void {
+  public forEach(callback: (value: T, key: ResourceLocation, map: Map<ResourceLocation, T>) => void, thisArg?: unknown): void {
     for (const [key, value] of this.map)
       callback.call(thisArg, value, new ResourceLocation(key), this);
   }

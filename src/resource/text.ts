@@ -1,71 +1,21 @@
-export type Color = "black" | "dark_blue" | "dark_green" | "dark_aqua" | "dark_red" | "dark_purple" | "gold" | "gray" | "dark_gray" | "blue" | "green" | "aqua" | "red" | "light_purple" | "yellow" | "white" | "reset" | "bold" | "italic" | "underlined" | "strikethrough" | "obfuscated";
+import { promises as fs } from "fs";
+import * as path from "path";
+import { getResources, makeDir } from "../util";
+import ResourceMap = require("../resource-map");
 
-export interface SimpleTextProvider {
-  text: string;
+export type Text = string;
+
+export async function readTexts(dir: string, map: ResourceMap<Text>): Promise<void> {
+  for (const id of await getResources(dir, "texts", path => path.endsWith(".txt"))) {
+    const filePath = path.join(dir, id.toPath("texts", ".txt"));
+    map.set(id, await fs.readFile(filePath, "utf8"));
+  }
 }
 
-export interface TranslateTextProvider {
-  translate: string;
-  with?: (string | ComponentObject)[];
+export async function writeTexts(dir: string, map: ResourceMap<Text>): Promise<void> {
+  for (const [id, value] of map.entries()) {
+    const filePath = path.join(dir, id.toPath("texts", ".txt"));
+    await makeDir(path.dirname(filePath));
+    await fs.writeFile(filePath, value);
+  }
 }
-
-export interface ScoreTextProvider {
-  score: {
-    name: string;
-    objective: string;
-    value?: string;
-  };
-}
-
-export interface SelectorTextProvider {
-  selector: string;
-}
-
-export interface KeybindTextProvider {
-  keybind: string;
-}
-
-export interface BlockTextProvider {
-  nbt: string;
-  interpret?: boolean;
-  block: string;
-}
-
-export interface EntityTextProvider {
-  nbt: string;
-  interpret?: boolean;
-  entity: string;
-}
-
-export interface StorageTextProvider {
-  nbt: string;
-  interpret?: boolean;
-  storage: string;
-}
-
-export interface ClickEvent {
-  action: "open_url" | "run_command" | "change_page" | "suggest_command" | "copy_to_clipboard";
-  value: string;
-}
-
-export interface HoverEvent {
-  action: "show_text" | "show_item" | "show_entity";
-  value: Component;
-}
-
-export interface TextAttributes {
-  color?: Color;
-  bold?: boolean;
-  italic?: boolean;
-  underlined?: boolean;
-  strikethrough?: boolean;
-  obfuscated?: boolean;
-  insertion?: string;
-  clickEvent?: ClickEvent;
-  hoverEvent?: HoverEvent;
-  extra?: Component[];
-}
-
-export type TextProvider = SimpleTextProvider | TranslateTextProvider | ScoreTextProvider | SelectorTextProvider | KeybindTextProvider | BlockTextProvider | EntityTextProvider | StorageTextProvider;
-export type ComponentObject = TextProvider & TextAttributes;
-export type Component = string | Component[] | ComponentObject;

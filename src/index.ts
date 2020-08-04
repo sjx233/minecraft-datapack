@@ -1,146 +1,218 @@
-import * as fs from "fs-extra";
+import { promises as fs } from "fs";
 import * as path from "path";
-import { Advancement, Blockstate, Font, LootTable, Model, Predicate, Recipe, ResourceType, Tag, Texture } from "./resource";
-import { read, write } from "./resource/io";
-import ResourceLocation = require("resource-location");
+import { Advancement, readAdvancements, writeAdvancements } from "./resource/advancement";
+import { Blockstate, readBlockstates, writeBlockstates } from "./resource/blockstate";
+import { Font, readFonts, writeFonts } from "./resource/font";
+import { FontData, readFontData, writeFontData } from "./resource/font_data";
+import { MCFunction, readFunctions, writeFunctions } from "./resource/function";
+import { Language, readLanguages, writeLanguages } from "./resource/language";
+import { LootTable, readLootTables, writeLootTables } from "./resource/loot_table";
+import { Model, readModels, writeModels } from "./resource/model";
+import { PostEffect, readPostEffects, writePostEffects } from "./resource/post_effect";
+import { Predicate, readPredicates, writePredicates } from "./resource/predicate";
+import { Program, readPrograms, writePrograms } from "./resource/program";
+import { readRecipes, Recipe, writeRecipes } from "./resource/recipe";
+import { readShaders, Shader, writeShaders } from "./resource/shader";
+import { readSounds, Sound, writeSounds } from "./resource/sound";
+import { readSoundEvents, SoundEvent, writeSoundEvents } from "./resource/sound_event";
+import { readStructures, Structure, writeStructures } from "./resource/structure";
+import { readTags, Tag, writeTags } from "./resource/tag";
+import { readTexts, Text, writeTexts } from "./resource/text";
+import { readTextures, Texture, writeTextures } from "./resource/texture";
+import { readTextureMetadata, TextureMetadata, writeTextureMetadata } from "./resource/texture_metadata";
+import { Component } from "./text";
+import { emptyDir, readJSON, writeJSON } from "./util";
 import ResourceMap = require("./resource-map");
 
-export * from "./resource";
-export { ResourceMap };
-
+export {
+  Texture, TextureMetadata, Blockstate, Model, Sound, SoundEvent, Language, Text, Font, FontData, PostEffect, Program, Shader,
+  Advancement, MCFunction as Function, LootTable, Predicate, Recipe, Structure, Tag,
+  Component, ResourceMap
+};
 export type PackType = "assets" | "data";
 
-export abstract class Pack {
-  public static readonly format = 5;
-
-  public constructor(public readonly type: PackType, public readonly description: string) { }
-
-  public async write(dirname: string, writeCallback?: (type: ResourceType, id: ResourceLocation) => void): Promise<void> {
-    await fs.emptyDir(dirname);
-    await fs.writeJson(path.join(dirname, "pack.mcmeta"), {
-      "pack": {
-        "description": this.description,
-        "pack_format": 5
-      }
-    });
-    await this.writeResources(path.join(dirname, this.type), writeCallback);
-  }
-
-  protected abstract writeResources(dirname: string, writeCallback?: (type: ResourceType, id: ResourceLocation) => void): Promise<void>;
-
-  public static async read(dirname: string, type: PackType, checkFormat = true): Promise<Pack> {
-    const meta = await fs.readJson(path.join(dirname, "pack.mcmeta"));
-    const { description, pack_format: format }: {
-      description: string;
-      pack_format: number;
-    } = meta.pack;
-    if (typeof description !== "string") throw new TypeError(`invalid description: expected string, got ${typeof description}`);
-    if (checkFormat && format !== this.format) throw new TypeError(`invalid pack format: expected ${this.format}, got ${format}`);
-    const pack = this.construct(type, description);
-    await pack.readResources(path.join(dirname, type));
-    return pack;
-  }
-
-  protected abstract readResources(dirname: string): Promise<void>;
-
-  private static construct(type: PackType, description: string): Pack {
-    /* eslint-disable @typescript-eslint/no-use-before-define */
-    switch (type) {
-      case "assets":
-        return new ResourcePack(description);
-      case "data":
-        return new DataPack(description);
-      default:
-        throw new TypeError("invalid pack type");
-    }
-    /* eslint-enable @typescript-eslint/no-use-before-define */
-  }
+interface PackMetadataSection {
+  description: Component;
+  pack_format: 5;
 }
 
-export class ResourcePack extends Pack {
-  private static readonly fields = [
-    ["texture", "textures"],
-    ["blockstate", "blockstates"],
-    ["model", "models"],
-    ["sound", "sounds"],
-    ["language", "languages"],
-    ["text", "texts"],
-    ["font", "fonts"],
-    ["shader", "shaders"]
-  ] as const;
+interface LanguageMetadataSection {
+  [id: string]: {
+    region: string;
+    name: string;
+    bidirectional?: boolean;
+  };
+}
+
+interface ResourcePackMetadata {
+  pack: PackMetadataSection;
+  language?: LanguageMetadataSection;
+}
+
+interface DataPackMetadata {
+  pack: PackMetadataSection;
+}
+
+export class ResourcePack {
+  public readonly type: PackType = "assets";
+  public languageMetadata?: LanguageMetadataSection;
+  public gpuWarnlist?: {
+    renderer: string[];
+    version: string[];
+    vendor: string[];
+  };
   public readonly textures = new ResourceMap<Texture>();
+  public readonly textureMetadata = new ResourceMap<TextureMetadata>();
   public readonly blockstates = new ResourceMap<Blockstate>();
   public readonly models = new ResourceMap<Model>();
-  public readonly sounds = new ResourceMap<Uint8Array>();
-  public readonly languages = new ResourceMap<Record<string, string>>();
-  public readonly texts = new ResourceMap<string>();
+  public readonly sounds = new ResourceMap<Sound>();
+  public readonly soundEvents = new ResourceMap<SoundEvent>();
+  public readonly languages = new ResourceMap<Language>();
+  public readonly texts = new ResourceMap<Text>();
   public readonly fonts = new ResourceMap<Font>();
-  public readonly shaders = new ResourceMap<string>();
+  public readonly fontData = new ResourceMap<FontData>();
+  public readonly postEffects = new ResourceMap<PostEffect>();
+  public readonly programs = new ResourceMap<Program>();
+  public readonly shaders = new ResourceMap<Shader>();
 
-  public constructor(description: string) {
-    super("assets", description);
-  }
+  public constructor(public description: Component = "", public icon?: Uint8Array) { }
 
-  protected async writeResources(dirname: string, writeCallback?: (type: ResourceType, id: ResourceLocation) => void): Promise<void> {
-    if (writeCallback) {
-      for (const [type, key] of ResourcePack.fields)
-        for (const [id, resource] of this[key]) {
-          await write(dirname, type, id, resource);
-          writeCallback(type, id);
-        }
-    } else {
-      for (const [type, key] of ResourcePack.fields)
-        for (const [id, resource] of this[key])
-          await write(dirname, type, id, resource);
+  public async read(dir: string): Promise<void> {
+    const meta: ResourcePackMetadata = await readJSON(path.join(dir, "pack.mcmeta"));
+    this.description = meta.pack.description;
+    this.languageMetadata = meta.language;
+    try {
+      this.icon = await fs.readFile(path.join(dir, "pack.png"));
+    } catch (e) {
+      this.icon = undefined;
     }
+    dir = path.join(dir, this.type);
+    try {
+      this.gpuWarnlist = await readJSON(path.join(dir, "minecraft", "gpu_warnlist.json"));
+    } catch (e) {
+      this.gpuWarnlist = undefined;
+    }
+    await readTextures(dir, this.textures);
+    await readTextureMetadata(dir, this.textureMetadata);
+    await readBlockstates(dir, this.blockstates);
+    await readModels(dir, this.models);
+    await readSounds(dir, this.sounds);
+    await readSoundEvents(dir, this.soundEvents);
+    await readLanguages(dir, this.languages);
+    await readTexts(dir, this.texts);
+    await readFonts(dir, this.fonts);
+    await readFontData(dir, this.fontData);
+    await readPostEffects(dir, this.postEffects);
+    await readPrograms(dir, this.programs);
+    await readShaders(dir, this.shaders);
   }
 
-  protected async readResources(dirname: string): Promise<void> {
-    for (const [type, key] of ResourcePack.fields)
-      for await (const [id, resource] of read(dirname, type))
-        this[key].set(id, resource);
+  public async write(dir: string): Promise<void> {
+    await emptyDir(dir);
+    const meta: ResourcePackMetadata = {
+      pack: {
+        description: this.description,
+        pack_format: 5
+      },
+      language: this.languageMetadata
+    };
+    await writeJSON(path.join(dir, "pack.mcmeta"), meta);
+    if (this.icon) await fs.writeFile(path.join(dir, "pack.png"), this.icon);
+    dir = path.join(dir, this.type);
+    if (this.gpuWarnlist) await writeJSON(path.join(dir, "minecraft", "gpu_warnlist.json"), this.gpuWarnlist);
+    await writeTextures(dir, this.textures);
+    await writeTextureMetadata(dir, this.textureMetadata);
+    await writeBlockstates(dir, this.blockstates);
+    await writeModels(dir, this.models);
+    await writeSounds(dir, this.sounds);
+    await writeSoundEvents(dir, this.soundEvents);
+    await writeLanguages(dir, this.languages);
+    await writeTexts(dir, this.texts);
+    await writeFonts(dir, this.fonts);
+    await writeFontData(dir, this.fontData);
+    await writePostEffects(dir, this.postEffects);
+    await writePrograms(dir, this.programs);
+    await writeShaders(dir, this.shaders);
   }
 }
 
-export class DataPack extends Pack {
-  private static readonly fields = [
-    ["advancement", "advancements"],
-    ["function", "functions"],
-    ["loot_table", "lootTables"],
-    ["predicate", "predicates"],
-    ["structure", "structures"],
-    ["recipe", "recipes"],
-    ["tag", "tags"]
-  ] as const;
+export class DataPack {
+  public readonly type: PackType = "data";
   public readonly advancements = new ResourceMap<Advancement>();
-  public readonly functions = new ResourceMap<string[]>();
+  public readonly functions = new ResourceMap<MCFunction>();
   public readonly lootTables = new ResourceMap<LootTable>();
   public readonly predicates = new ResourceMap<Predicate>();
-  public readonly structures = new ResourceMap<Uint8Array>();
   public readonly recipes = new ResourceMap<Recipe>();
+  public readonly structures = new ResourceMap<Structure>();
   public readonly tags = new ResourceMap<Tag>();
+  // public readonly dimensionTypes = new ResourceMap<DimensionType>();
+  // public readonly dimensions = new ResourceMap<Dimension>();
+  // public readonly biomes = new ResourceMap<Biome>();
+  // public readonly carvers = new ResourceMap<Carver>();
+  // public readonly features = new ResourceMap<Feature>();
+  // public readonly structureFeatures = new ResourceMap<StructureFeature>();
+  // public readonly surfaceBuilders = new ResourceMap<SurfaceBuilder>();
+  // public readonly noiseSettings = new ResourceMap<NoiseSettings>();
+  // public readonly processorLists = new ResourceMap<ProcessorList>();
+  // public readonly templatePools = new ResourceMap<TemplatePool>();
 
-  public constructor(description: string) {
-    super("data", description);
-  }
+  public constructor(public description: Component = "", public icon?: Uint8Array) { }
 
-  protected async writeResources(dirname: string, writeCallback?: (type: ResourceType, id: ResourceLocation) => void): Promise<void> {
-    if (writeCallback) {
-      for (const [type, key] of DataPack.fields)
-        for (const [id, resource] of this[key]) {
-          await write(dirname, type, id, resource);
-          writeCallback(type, id);
-        }
-    } else {
-      for (const [type, key] of DataPack.fields)
-        for (const [id, resource] of this[key])
-          await write(dirname, type, id, resource);
+  public async read(dir: string): Promise<void> {
+    const meta: DataPackMetadata = await readJSON(path.join(dir, "pack.mcmeta"));
+    this.description = meta.pack.description;
+    try {
+      this.icon = await fs.readFile(path.join(dir, "pack.png"));
+    } catch (e) {
+      this.icon = undefined;
     }
+    dir = path.join(dir, this.type);
+    await readAdvancements(dir, this.advancements);
+    await readFunctions(dir, this.functions);
+    await readLootTables(dir, this.lootTables);
+    await readPredicates(dir, this.predicates);
+    await readRecipes(dir, this.recipes);
+    await readStructures(dir, this.structures);
+    await readTags(dir, this.tags);
+    // await readDimensionTypes(dir, this.dimensionTypes);
+    // await readDimensions(dir, this.dimensions);
+    // await readBiomes(dir, this.biomes);
+    // await readCarvers(dir, this.carvers);
+    // await readFeatures(dir, this.features);
+    // await readStructureFeatures(dir, this.structureFeatures);
+    // await readSurfaceBuilders(dir, this.surfaceBuilders);
+    // await readNoiseSettings(dir, this.noiseSettings);
+    // await readProcessorLists(dir, this.processorLists);
+    // await readTemplatePools(dir, this.templatePools);
   }
 
-  protected async readResources(dirname: string): Promise<void> {
-    for (const [type, key] of DataPack.fields)
-      for await (const [id, resource] of read(dirname, type))
-        this[key].set(id, resource);
+  public async write(dir: string): Promise<void> {
+    await emptyDir(dir);
+    const meta: DataPackMetadata = {
+      pack: {
+        description: this.description,
+        pack_format: 5
+      }
+    };
+    await writeJSON(path.join(dir, "pack.mcmeta"), meta);
+    if (this.icon) await fs.writeFile(path.join(dir, "pack.png"), this.icon);
+    dir = path.join(dir, this.type);
+    await writeAdvancements(dir, this.advancements);
+    await writeFunctions(dir, this.functions);
+    await writeLootTables(dir, this.lootTables);
+    await writePredicates(dir, this.predicates);
+    await writeRecipes(dir, this.recipes);
+    await writeStructures(dir, this.structures);
+    await writeTags(dir, this.tags);
+    // await writeDimensionTypes(dir, this.dimensionTypes);
+    // await writeDimensions(dir, this.dimensions);
+    // await writeBiomes(dir, this.biomes);
+    // await writeCarvers(dir, this.carvers);
+    // await writeFeatures(dir, this.features);
+    // await writeStructureFeatures(dir, this.structureFeatures);
+    // await writeSurfaceBuilders(dir, this.surfaceBuilders);
+    // await writeNoiseSettings(dir, this.noiseSettings);
+    // await writeProcessorLists(dir, this.processorLists);
+    // await writeTemplatePools(dir, this.templatePools);
   }
 }
