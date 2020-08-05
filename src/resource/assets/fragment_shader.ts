@@ -3,16 +3,16 @@ import * as path from "path";
 import { getResources, makeDir } from "../../util";
 import ResourceMap = require("../../resource-map");
 
-export type Shader = string;
+export type FragmentShader = string;
 
-export async function readShaders(dir: string, map: ResourceMap<Shader>): Promise<void> {
-  for (const id of await getResources(dir, "shaders/program", path => !path.endsWith(".json"))) {
+export async function readFragmentShaders(dir: string, map: ResourceMap<FragmentShader>): Promise<void> {
+  for (const id of await getResources(dir, "shaders/program", path => path.endsWith(".fsh"))) {
     const filePath = path.join(dir, id.toPath("shaders/program"));
     map.set(id, await fs.readFile(filePath, "utf8"));
   }
 }
 
-export async function writeShaders(dir: string, map: ResourceMap<Shader>): Promise<void> {
+export async function writeFragmentShaders(dir: string, map: ResourceMap<FragmentShader>): Promise<void> {
   for (const [id, value] of map.entries()) {
     const filePath = path.join(dir, id.toPath("shaders/program"));
     await makeDir(path.dirname(filePath));

@@ -2,18 +2,19 @@ import { promises as fs } from "fs";
 import * as path from "path";
 import { Blockstate, readBlockstates, writeBlockstates } from "./resource/assets/blockstate";
 import { Font, readFonts, writeFonts } from "./resource/assets/font";
+import { FragmentShader, readFragmentShaders, writeFragmentShaders } from "./resource/assets/fragment_shader";
 import { GlyphSizes, readGlyphSizes, writeGlyphSizes } from "./resource/assets/glyph_sizes";
 import { Language, readLanguages, writeLanguages } from "./resource/assets/language";
 import { Model, readModels, writeModels } from "./resource/assets/model";
 import { PostEffect, readPostEffects, writePostEffects } from "./resource/assets/post_effect";
 import { Program, readPrograms, writePrograms } from "./resource/assets/program";
-import { readShaders, Shader, writeShaders } from "./resource/assets/shader";
 import { readSounds, Sound, writeSounds } from "./resource/assets/sound";
 import { readSoundEvents, SoundEvent, writeSoundEvents } from "./resource/assets/sound_event";
 import { readTexts, Text, writeTexts } from "./resource/assets/text";
 import { readTextures, Texture, writeTextures } from "./resource/assets/texture";
 import { readTextureMetadata, TextureMetadata, writeTextureMetadata } from "./resource/assets/texture_metadata";
 import { readTrueTypeFonts, TrueTypeFont, writeTrueTypeFonts } from "./resource/assets/true_type_font";
+import { readVertexShaders, VertexShader, writeVertexShaders } from "./resource/assets/vertex_shader";
 import { Advancement, readAdvancements, writeAdvancements } from "./resource/data/advancement";
 import { MCFunction, readFunctions, writeFunctions } from "./resource/data/function";
 import { LootTable, readLootTables, writeLootTables } from "./resource/data/loot_table";
@@ -26,7 +27,7 @@ import { emptyDir, readJSON, writeJSON } from "./util";
 import ResourceMap = require("./resource-map");
 
 export {
-  Texture, TextureMetadata, Blockstate, Model, Sound, SoundEvent, Language, Text, Font, GlyphSizes, TrueTypeFont, PostEffect, Program, Shader,
+  Texture, TextureMetadata, Blockstate, Model, Sound, SoundEvent, Language, Text, Font, GlyphSizes, TrueTypeFont, PostEffect, Program, VertexShader, FragmentShader,
   Advancement, MCFunction as Function, LootTable, Predicate, Recipe, Structure, Tag,
   Component, ResourceMap
 };
@@ -75,7 +76,8 @@ export class ResourcePack {
   public readonly trueTypeFonts = new ResourceMap<TrueTypeFont>();
   public readonly postEffects = new ResourceMap<PostEffect>();
   public readonly programs = new ResourceMap<Program>();
-  public readonly shaders = new ResourceMap<Shader>();
+  public readonly vertexShaders = new ResourceMap<VertexShader>();
+  public readonly fragmentShaders = new ResourceMap<FragmentShader>();
 
   public constructor(public description: Component = "", public icon?: Uint8Array) { }
 
@@ -107,7 +109,8 @@ export class ResourcePack {
     await readTrueTypeFonts(dir, this.trueTypeFonts);
     await readPostEffects(dir, this.postEffects);
     await readPrograms(dir, this.programs);
-    await readShaders(dir, this.shaders);
+    await readVertexShaders(dir, this.vertexShaders);
+    await readFragmentShaders(dir, this.fragmentShaders);
   }
 
   public async write(dir: string): Promise<void> {
@@ -136,7 +139,8 @@ export class ResourcePack {
     await writeTrueTypeFonts(dir, this.trueTypeFonts);
     await writePostEffects(dir, this.postEffects);
     await writePrograms(dir, this.programs);
-    await writeShaders(dir, this.shaders);
+    await writeVertexShaders(dir, this.vertexShaders);
+    await writeFragmentShaders(dir, this.fragmentShaders);
   }
 }
 
