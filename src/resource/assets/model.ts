@@ -64,7 +64,7 @@ export interface Model {
 }
 
 export async function readModels(dir: string, map: ResourceMap<Model>): Promise<void> {
-  for (const id of await getResources(dir, "models", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "models", ".json")) {
     const filePath = path.join(dir, id.toPath("models", ".json"));
     map.set(id, await readJSON(filePath));
   }

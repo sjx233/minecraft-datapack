@@ -43,7 +43,7 @@ export interface Advancement {
 }
 
 export async function readAdvancements(dir: string, map: ResourceMap<Advancement>): Promise<void> {
-  for (const id of await getResources(dir, "advancements", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "advancements", ".json")) {
     const filePath = path.join(dir, id.toPath("advancements", ".json"));
     map.set(id, await readJSON(filePath));
   }

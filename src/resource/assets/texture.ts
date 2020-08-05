@@ -6,7 +6,7 @@ import ResourceMap = require("../../resource-map");
 export type Texture = Uint8Array;
 
 export async function readTextures(dir: string, map: ResourceMap<Texture>): Promise<void> {
-  for (const id of await getResources(dir, "textures", path => path.endsWith(".png"))) {
+  for (const id of await getResources(dir, "textures", ".png")) {
     const filePath = path.join(dir, id.toPath("textures", ".png"));
     map.set(id, await fs.readFile(filePath));
   }

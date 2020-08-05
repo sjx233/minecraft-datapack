@@ -11,7 +11,7 @@ const gunzip = promisify<zlib.InputType, Buffer>(zlib.gunzip);
 export type Structure = Uint8Array;
 
 export async function readStructures(dir: string, map: ResourceMap<Structure>): Promise<void> {
-  for (const id of await getResources(dir, "structures", path => path.endsWith(".nbt"))) {
+  for (const id of await getResources(dir, "structures", ".nbt")) {
     const filePath = path.join(dir, id.toPath("structures", ".nbt"));
     map.set(id, await gunzip(await fs.readFile(filePath)));
   }

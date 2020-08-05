@@ -9,7 +9,7 @@ export interface Predicate {
 }
 
 export async function readPredicates(dir: string, map: ResourceMap<Predicate>): Promise<void> {
-  for (const id of await getResources(dir, "predicates", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "predicates", ".json")) {
     const filePath = path.join(dir, id.toPath("predicates", ".json"));
     map.set(id, await readJSON(filePath));
   }

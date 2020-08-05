@@ -6,7 +6,7 @@ import ResourceMap = require("../../resource-map");
 export type VertexShader = string;
 
 export async function readVertexShaders(dir: string, map: ResourceMap<VertexShader>): Promise<void> {
-  for (const id of await getResources(dir, "shaders/program", path => path.endsWith(".vsh"))) {
+  for (const id of await getResources(dir, "shaders/program", ".vsh")) {
     const filePath = path.join(dir, id.toPath("shaders/program"));
     map.set(id, await fs.readFile(filePath, "utf8"));
   }

@@ -31,7 +31,7 @@ export interface Font {
 }
 
 export async function readFonts(dir: string, map: ResourceMap<Font>): Promise<void> {
-  for (const id of await getResources(dir, "font", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "font", ".json")) {
     const filePath = path.join(dir, id.toPath("font", ".json"));
     map.set(id, await readJSON(filePath));
   }

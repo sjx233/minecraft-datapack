@@ -10,7 +10,7 @@ export interface Tag {
 }
 
 export async function readTags(dir: string, map: ResourceMap<Tag>): Promise<void> {
-  for (const id of await getResources(dir, "tags", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "tags", ".json")) {
     const filePath = path.join(dir, id.toPath("tags", ".json"));
     map.set(id, await readJSON(filePath));
   }

@@ -5,7 +5,7 @@ import ResourceMap = require("../../resource-map");
 export type Language = Record<string, string>;
 
 export async function readLanguages(dir: string, map: ResourceMap<Language>): Promise<void> {
-  for (const id of await getResources(dir, "lang", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "lang", ".json")) {
     const filePath = path.join(dir, id.toPath("lang", ".json"));
     map.set(id, await readJSON(filePath));
   }

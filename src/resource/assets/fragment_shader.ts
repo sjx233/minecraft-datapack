@@ -6,7 +6,7 @@ import ResourceMap = require("../../resource-map");
 export type FragmentShader = string;
 
 export async function readFragmentShaders(dir: string, map: ResourceMap<FragmentShader>): Promise<void> {
-  for (const id of await getResources(dir, "shaders/program", path => path.endsWith(".fsh"))) {
+  for (const id of await getResources(dir, "shaders/program", ".fsh")) {
     const filePath = path.join(dir, id.toPath("shaders/program"));
     map.set(id, await fs.readFile(filePath, "utf8"));
   }

@@ -6,7 +6,7 @@ import ResourceMap = require("../../resource-map");
 export type Text = string;
 
 export async function readTexts(dir: string, map: ResourceMap<Text>): Promise<void> {
-  for (const id of await getResources(dir, "texts", path => path.endsWith(".txt"))) {
+  for (const id of await getResources(dir, "texts", ".txt")) {
     const filePath = path.join(dir, id.toPath("texts", ".txt"));
     map.set(id, await fs.readFile(filePath, "utf8"));
   }

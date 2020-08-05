@@ -31,7 +31,7 @@ export interface Program {
 }
 
 export async function readPrograms(dir: string, map: ResourceMap<Program>): Promise<void> {
-  for (const id of await getResources(dir, "shaders/program", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "shaders/program", ".json")) {
     const filePath = path.join(dir, id.toPath("shaders/program", ".json"));
     map.set(id, await readJSON(filePath));
   }

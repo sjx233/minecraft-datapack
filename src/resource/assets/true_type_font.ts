@@ -6,7 +6,7 @@ import ResourceMap = require("../../resource-map");
 export type TrueTypeFont = Uint8Array;
 
 export async function readTrueTypeFonts(dir: string, map: ResourceMap<TrueTypeFont>): Promise<void> {
-  for (const id of await getResources(dir, "font", path => path.endsWith(".ttf"))) {
+  for (const id of await getResources(dir, "font", ".ttf")) {
     const filePath = path.join(dir, id.toPath("font"));
     map.set(id, await fs.readFile(filePath));
   }

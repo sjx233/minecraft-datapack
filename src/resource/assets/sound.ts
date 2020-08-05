@@ -6,7 +6,7 @@ import ResourceMap = require("../../resource-map");
 export type Sound = Uint8Array;
 
 export async function readSounds(dir: string, map: ResourceMap<Sound>): Promise<void> {
-  for (const id of await getResources(dir, "sounds", path => path.endsWith(".ogg"))) {
+  for (const id of await getResources(dir, "sounds", ".ogg")) {
     const filePath = path.join(dir, id.toPath("sounds", ".ogg"));
     map.set(id, await fs.readFile(filePath));
   }

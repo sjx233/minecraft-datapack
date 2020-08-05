@@ -26,7 +26,7 @@ export interface TextureMetadata {
 }
 
 export async function readTextureMetadata(dir: string, map: ResourceMap<TextureMetadata>): Promise<void> {
-  for (const id of await getResources(dir, "textures", path => path.endsWith(".png.mcmeta"))) {
+  for (const id of await getResources(dir, "textures", ".png.mcmeta")) {
     const filePath = path.join(dir, id.toPath("textures", ".png.mcmeta"));
     map.set(id, await readJSON(filePath));
   }

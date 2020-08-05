@@ -36,7 +36,7 @@ export interface PostEffect {
 }
 
 export async function readPostEffects(dir: string, map: ResourceMap<PostEffect>): Promise<void> {
-  for (const id of await getResources(dir, "shaders/post", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "shaders/post", ".json")) {
     const filePath = path.join(dir, id.toPath("shaders/post", ".json"));
     map.set(id, await readJSON(filePath));
   }

@@ -48,7 +48,7 @@ export interface LootTable {
 }
 
 export async function readLootTables(dir: string, map: ResourceMap<LootTable>): Promise<void> {
-  for (const id of await getResources(dir, "loot_tables", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "loot_tables", ".json")) {
     const filePath = path.join(dir, id.toPath("loot_tables", ".json"));
     map.set(id, await readJSON(filePath));
   }

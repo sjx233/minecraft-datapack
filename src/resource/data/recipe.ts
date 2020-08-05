@@ -9,7 +9,7 @@ export interface Recipe {
 }
 
 export async function readRecipes(dir: string, map: ResourceMap<Recipe>): Promise<void> {
-  for (const id of await getResources(dir, "recipes", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "recipes", ".json")) {
     const filePath = path.join(dir, id.toPath("recipes", ".json"));
     map.set(id, await readJSON(filePath));
   }

@@ -30,7 +30,7 @@ export interface Blockstate {
 }
 
 export async function readBlockstates(dir: string, map: ResourceMap<Blockstate>): Promise<void> {
-  for (const id of await getResources(dir, "blockstates", path => path.endsWith(".json"))) {
+  for (const id of await getResources(dir, "blockstates", ".json")) {
     const filePath = path.join(dir, id.toPath("blockstates", ".json"));
     map.set(id, await readJSON(filePath));
   }
