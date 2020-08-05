@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import * as path from "path";
 import { Blockstate, readBlockstates, writeBlockstates } from "./resource/assets/blockstate";
 import { Font, readFonts, writeFonts } from "./resource/assets/font";
-import { FontData, readFontData, writeFontData } from "./resource/assets/font_data";
+import { GlyphSizes, readGlyphSizes, writeGlyphSizes } from "./resource/assets/glyph_sizes";
 import { Language, readLanguages, writeLanguages } from "./resource/assets/language";
 import { Model, readModels, writeModels } from "./resource/assets/model";
 import { PostEffect, readPostEffects, writePostEffects } from "./resource/assets/post_effect";
@@ -13,6 +13,7 @@ import { readSoundEvents, SoundEvent, writeSoundEvents } from "./resource/assets
 import { readTexts, Text, writeTexts } from "./resource/assets/text";
 import { readTextures, Texture, writeTextures } from "./resource/assets/texture";
 import { readTextureMetadata, TextureMetadata, writeTextureMetadata } from "./resource/assets/texture_metadata";
+import { readTrueTypeFonts, TrueTypeFont, writeTrueTypeFonts } from "./resource/assets/true_type_font";
 import { Advancement, readAdvancements, writeAdvancements } from "./resource/data/advancement";
 import { MCFunction, readFunctions, writeFunctions } from "./resource/data/function";
 import { LootTable, readLootTables, writeLootTables } from "./resource/data/loot_table";
@@ -25,7 +26,7 @@ import { emptyDir, readJSON, writeJSON } from "./util";
 import ResourceMap = require("./resource-map");
 
 export {
-  Texture, TextureMetadata, Blockstate, Model, Sound, SoundEvent, Language, Text, Font, FontData, PostEffect, Program, Shader,
+  Texture, TextureMetadata, Blockstate, Model, Sound, SoundEvent, Language, Text, Font, GlyphSizes, TrueTypeFont, PostEffect, Program, Shader,
   Advancement, MCFunction as Function, LootTable, Predicate, Recipe, Structure, Tag,
   Component, ResourceMap
 };
@@ -70,7 +71,8 @@ export class ResourcePack {
   public readonly languages = new ResourceMap<Language>();
   public readonly texts = new ResourceMap<Text>();
   public readonly fonts = new ResourceMap<Font>();
-  public readonly fontData = new ResourceMap<FontData>();
+  public readonly glyphSizes = new ResourceMap<GlyphSizes>();
+  public readonly trueTypeFonts = new ResourceMap<TrueTypeFont>();
   public readonly postEffects = new ResourceMap<PostEffect>();
   public readonly programs = new ResourceMap<Program>();
   public readonly shaders = new ResourceMap<Shader>();
@@ -101,7 +103,8 @@ export class ResourcePack {
     await readLanguages(dir, this.languages);
     await readTexts(dir, this.texts);
     await readFonts(dir, this.fonts);
-    await readFontData(dir, this.fontData);
+    await readGlyphSizes(dir, this.glyphSizes);
+    await readTrueTypeFonts(dir, this.trueTypeFonts);
     await readPostEffects(dir, this.postEffects);
     await readPrograms(dir, this.programs);
     await readShaders(dir, this.shaders);
@@ -129,7 +132,8 @@ export class ResourcePack {
     await writeLanguages(dir, this.languages);
     await writeTexts(dir, this.texts);
     await writeFonts(dir, this.fonts);
-    await writeFontData(dir, this.fontData);
+    await writeGlyphSizes(dir, this.glyphSizes);
+    await writeTrueTypeFonts(dir, this.trueTypeFonts);
     await writePostEffects(dir, this.postEffects);
     await writePrograms(dir, this.programs);
     await writeShaders(dir, this.shaders);
