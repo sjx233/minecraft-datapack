@@ -1,6 +1,6 @@
 import * as path from "path";
-import { getResources, makeDir, readJSON, writeJSON } from "../util";
-import ResourceMap = require("../resource-map");
+import { getResources, makeDir, readJSON, writeJSON } from "../../util";
+import ResourceMap = require("../../resource-map");
 
 interface Sampler {
   name: string;

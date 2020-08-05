@@ -1,7 +1,7 @@
 import * as path from "path";
-import { getResources, makeDir, readJSON, writeJSON } from "../util";
+import { getResources, makeDir, readJSON, writeJSON } from "../../util";
 import { Predicate } from "./predicate";
-import ResourceMap = require("../resource-map");
+import ResourceMap = require("../../resource-map");
 
 interface ConstantRange {
   type: "constant";

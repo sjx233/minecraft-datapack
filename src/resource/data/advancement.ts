@@ -1,7 +1,7 @@
 import * as path from "path";
-import { Component } from "../text";
-import { getResources, makeDir, readJSON, writeJSON } from "../util";
-import ResourceMap = require("../resource-map");
+import { Component } from "../../text";
+import { getResources, makeDir, readJSON, writeJSON } from "../../util";
+import ResourceMap = require("../../resource-map");
 
 interface AdvancementDisplay {
   title: Component;

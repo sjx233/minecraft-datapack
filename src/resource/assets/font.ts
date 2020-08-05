@@ -1,6 +1,6 @@
 import * as path from "path";
-import { ResourceMap } from "..";
-import { getResources, makeDir, readJSON, writeJSON } from "../util";
+import { getResources, makeDir, readJSON, writeJSON } from "../../util";
+import ResourceMap = require("../../resource-map");
 
 interface BitmapGlyphProvider {
   type: "bitmap";

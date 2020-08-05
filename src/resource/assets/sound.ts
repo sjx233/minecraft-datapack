@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import * as path from "path";
-import { getResources, makeDir } from "../util";
-import ResourceMap = require("../resource-map");
+import { getResources, makeDir } from "../../util";
+import ResourceMap = require("../../resource-map");
 
 export type Sound = Uint8Array;
 

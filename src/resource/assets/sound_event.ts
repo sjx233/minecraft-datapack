@@ -1,6 +1,6 @@
 import * as path from "path";
-import { getNamespaces, makeDir, readJSON, writeJSON } from "../util";
-import ResourceMap = require("../resource-map");
+import { getNamespaces, makeDir, readJSON, writeJSON } from "../../util";
+import ResourceMap = require("../../resource-map");
 import ResourceLocation = require("resource-location");
 
 export interface SoundEvent {

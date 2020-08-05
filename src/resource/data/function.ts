@@ -1,6 +1,6 @@
 import * as path from "path";
-import { getResources, makeDir, readLines, writeLines } from "../util";
-import ResourceMap = require("../resource-map");
+import { getResources, makeDir, readLines, writeLines } from "../../util";
+import ResourceMap = require("../../resource-map");
 
 export type MCFunction = string[];
 

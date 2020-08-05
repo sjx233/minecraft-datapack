@@ -2,8 +2,8 @@ import { promises as fs } from "fs";
 import * as path from "path";
 import { promisify } from "util";
 import * as zlib from "zlib";
-import { getResources, makeDir } from "../util";
-import ResourceMap = require("../resource-map");
+import { getResources, makeDir } from "../../util";
+import ResourceMap = require("../../resource-map");
 
 const gzip = promisify<zlib.InputType, Buffer>(zlib.gzip);
 const gunzip = promisify<zlib.InputType, Buffer>(zlib.gunzip);
