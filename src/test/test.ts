@@ -38,9 +38,9 @@ import { DataPack } from "..";
       { id: "minecraft:iron_door", required: false }
     ]
   });
-  await written.write("test/data");
+  await written.write("test");
   const read = new DataPack;
-  await read.read("test/data");
+  await read.read("test");
   assert.deepStrictEqual(read, written);
 })().catch(error => {
   process.stderr.write(error + "\n");
