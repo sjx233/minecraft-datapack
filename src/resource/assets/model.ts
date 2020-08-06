@@ -19,15 +19,13 @@ interface ModelFace {
   tintindex?: number;
 }
 
-type ModelFaces = {
-  [dir in Direction]?: ModelFace;
-};
-
 interface ModelElement {
   from: [number, number, number];
   to: [number, number, number];
   rotation?: ModelRotation;
-  faces: ModelFaces;
+  faces: {
+    [dir in Direction]?: ModelFace;
+  };
   shade?: boolean;
 }
 

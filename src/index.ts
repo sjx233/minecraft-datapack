@@ -16,12 +16,22 @@ import { readTextureMetadata, TextureMetadata, writeTextureMetadata } from "./re
 import { readTrueTypeFonts, TrueTypeFont, writeTrueTypeFonts } from "./resource/assets/true_type_font";
 import { readVertexShaders, VertexShader, writeVertexShaders } from "./resource/assets/vertex_shader";
 import { Advancement, readAdvancements, writeAdvancements } from "./resource/data/advancement";
+import { Biome, readBiomes, writeBiomes } from "./resource/data/biome";
+import { Carver, readCarvers, writeCarvers } from "./resource/data/carver";
+import { Dimension, readDimensions, writeDimensions } from "./resource/data/dimension";
+import { DimensionType, readDimensionTypes, writeDimensionTypes } from "./resource/data/dimension_type";
+import { Feature, readFeatures, writeFeatures } from "./resource/data/feature";
 import { MCFunction, readFunctions, writeFunctions } from "./resource/data/function";
 import { LootTable, readLootTables, writeLootTables } from "./resource/data/loot_table";
+import { NoiseSettings, readNoiseSettings, writeNoiseSettings } from "./resource/data/noise_settings";
 import { Predicate, readPredicates, writePredicates } from "./resource/data/predicate";
+import { ProcessorList, readProcessorLists, writeProcessorLists } from "./resource/data/processor_list";
 import { readRecipes, Recipe, writeRecipes } from "./resource/data/recipe";
 import { readStructures, Structure, writeStructures } from "./resource/data/structure";
+import { readStructureFeatures, StructureFeature, writeStructureFeatures } from "./resource/data/structure_feature";
+import { readSurfaceBuilders, SurfaceBuilder, writeSurfaceBuilders } from "./resource/data/surface_builder";
 import { readTags, Tag, writeTags } from "./resource/data/tag";
+import { readTemplatePools, TemplatePool, writeTemplatePools } from "./resource/data/template_pool";
 import { Component } from "./text";
 import { emptyDir, readJSON, writeJSON } from "./util";
 import ResourceMap = require("./resource-map");
@@ -153,16 +163,16 @@ export class DataPack {
   public readonly recipes = new ResourceMap<Recipe>();
   public readonly structures = new ResourceMap<Structure>();
   public readonly tags = new ResourceMap<Tag>();
-  // public readonly dimensionTypes = new ResourceMap<DimensionType>();
-  // public readonly dimensions = new ResourceMap<Dimension>();
-  // public readonly biomes = new ResourceMap<Biome>();
-  // public readonly carvers = new ResourceMap<Carver>();
-  // public readonly features = new ResourceMap<Feature>();
-  // public readonly structureFeatures = new ResourceMap<StructureFeature>();
-  // public readonly surfaceBuilders = new ResourceMap<SurfaceBuilder>();
-  // public readonly noiseSettings = new ResourceMap<NoiseSettings>();
-  // public readonly processorLists = new ResourceMap<ProcessorList>();
-  // public readonly templatePools = new ResourceMap<TemplatePool>();
+  public readonly dimensionTypes = new ResourceMap<DimensionType>();
+  public readonly dimensions = new ResourceMap<Dimension>();
+  public readonly biomes = new ResourceMap<Biome>();
+  public readonly carvers = new ResourceMap<Carver>();
+  public readonly features = new ResourceMap<Feature>();
+  public readonly structureFeatures = new ResourceMap<StructureFeature>();
+  public readonly surfaceBuilders = new ResourceMap<SurfaceBuilder>();
+  public readonly noiseSettings = new ResourceMap<NoiseSettings>();
+  public readonly processorLists = new ResourceMap<ProcessorList>();
+  public readonly templatePools = new ResourceMap<TemplatePool>();
 
   public constructor(public description: Component = "", public icon?: Uint8Array) { }
 
@@ -182,16 +192,16 @@ export class DataPack {
     await readRecipes(dir, this.recipes);
     await readStructures(dir, this.structures);
     await readTags(dir, this.tags);
-    // await readDimensionTypes(dir, this.dimensionTypes);
-    // await readDimensions(dir, this.dimensions);
-    // await readBiomes(dir, this.biomes);
-    // await readCarvers(dir, this.carvers);
-    // await readFeatures(dir, this.features);
-    // await readStructureFeatures(dir, this.structureFeatures);
-    // await readSurfaceBuilders(dir, this.surfaceBuilders);
-    // await readNoiseSettings(dir, this.noiseSettings);
-    // await readProcessorLists(dir, this.processorLists);
-    // await readTemplatePools(dir, this.templatePools);
+    await readDimensionTypes(dir, this.dimensionTypes);
+    await readDimensions(dir, this.dimensions);
+    await readBiomes(dir, this.biomes);
+    await readCarvers(dir, this.carvers);
+    await readFeatures(dir, this.features);
+    await readStructureFeatures(dir, this.structureFeatures);
+    await readSurfaceBuilders(dir, this.surfaceBuilders);
+    await readNoiseSettings(dir, this.noiseSettings);
+    await readProcessorLists(dir, this.processorLists);
+    await readTemplatePools(dir, this.templatePools);
   }
 
   public async write(dir: string): Promise<void> {
@@ -212,15 +222,15 @@ export class DataPack {
     await writeRecipes(dir, this.recipes);
     await writeStructures(dir, this.structures);
     await writeTags(dir, this.tags);
-    // await writeDimensionTypes(dir, this.dimensionTypes);
-    // await writeDimensions(dir, this.dimensions);
-    // await writeBiomes(dir, this.biomes);
-    // await writeCarvers(dir, this.carvers);
-    // await writeFeatures(dir, this.features);
-    // await writeStructureFeatures(dir, this.structureFeatures);
-    // await writeSurfaceBuilders(dir, this.surfaceBuilders);
-    // await writeNoiseSettings(dir, this.noiseSettings);
-    // await writeProcessorLists(dir, this.processorLists);
-    // await writeTemplatePools(dir, this.templatePools);
+    await writeDimensionTypes(dir, this.dimensionTypes);
+    await writeDimensions(dir, this.dimensions);
+    await writeBiomes(dir, this.biomes);
+    await writeCarvers(dir, this.carvers);
+    await writeFeatures(dir, this.features);
+    await writeStructureFeatures(dir, this.structureFeatures);
+    await writeSurfaceBuilders(dir, this.surfaceBuilders);
+    await writeNoiseSettings(dir, this.noiseSettings);
+    await writeProcessorLists(dir, this.processorLists);
+    await writeTemplatePools(dir, this.templatePools);
   }
 }
