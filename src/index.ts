@@ -45,7 +45,7 @@ export type PackType = "assets" | "data";
 
 interface PackMetadataSection {
   description: Component;
-  pack_format: 5;
+  pack_format: 6;
 }
 
 interface LanguageMetadataSection {
@@ -128,7 +128,7 @@ export class ResourcePack {
     const meta: ResourcePackMetadata = {
       pack: {
         description: this.description,
-        pack_format: 5
+        pack_format: 6
       },
       language: this.languageMetadata
     };
@@ -209,7 +209,7 @@ export class DataPack {
     const meta: DataPackMetadata = {
       pack: {
         description: this.description,
-        pack_format: 5
+        pack_format: 6
       }
     };
     await writeJSON(path.join(dir, "pack.mcmeta"), meta);

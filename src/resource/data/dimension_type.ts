@@ -15,6 +15,7 @@ export interface DimensionType {
   has_raids: boolean;
   logical_height: number;
   infiniburn: string;
+  effects?: string;
   ambient_light: number;
 }
 
